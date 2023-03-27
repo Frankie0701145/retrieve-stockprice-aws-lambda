@@ -1,3 +1,5 @@
+'use strict';
+
 const mysql = require('mysql2/promise');
 const axios = require('axios');
 
