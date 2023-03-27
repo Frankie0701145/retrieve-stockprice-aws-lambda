@@ -1,12 +1,19 @@
 const mysql = require('mysql2/promise');
 const axios = require('axios');
 
+const databasePassword = process.env.DB_PASSWORD;
+const databaseUser = process.env.DB_USER;
+const databasePort = process.env.DB_PORT;
+const databaseHostName = process.env.DB_HOST_NAME;
+const databaseName = process.env.DB_NAME;
+const rapidKey = process.env.RAPID_KEY;
+
 const Config = {
-    host: "stock-prices2.cpomh9kl0278.eu-west-1.rds.amazonaws.com",
-    port: "3306",
-    user: "admin",
-    password: "stockPrices2023;",
-    database: "stock_prices"
+    host: databaseHostName,
+    port: databasePort,
+    user: databaseUser,
+    password: databasePassword,
+    database: databaseName
 }
 
 const fetchQuotes = async ()=>{
@@ -15,7 +22,7 @@ const fetchQuotes = async ()=>{
         url: 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-trending-tickers',
         params: {region: 'US'},
         headers: {
-          'X-RapidAPI-Key': '64174d1a2bmshbaa9943f1601efcp11bc86jsn13f6e4a02765',
+          'X-RapidAPI-Key': rapidKey,
           'X-RapidAPI-Host': 'apidojo-yahoo-finance-v1.p.rapidapi.com'
         }
     };
@@ -33,15 +40,15 @@ const fetchQuotes = async ()=>{
     }
 }
 
-const handler = async (event, context)=>{
+export const handler = async (event, context)=>{
     // fetch quotes
     const quotes = await fetchQuotes();
     // fetch quotes
-
+    let connection;
     try{
         // create connection
-        const connection = await mysql.createConnection(Config);
-        console.log("********connection made*******");
+        connection = await mysql.createConnection(Config);
+        console.info("********connection made*******");
         // create connection
 
         // create table if does not exists
@@ -57,13 +64,15 @@ const handler = async (event, context)=>{
         // insert data
         const insertPricesQuery = "INSERT INTO StockPrice (company_name, symbol, price, percent_change) VALUES ?"
         await connection.query(insertPricesQuery, [quotes]);
-        console.log("records inserted");
+        console.info("***********records inserted***********");
         // insert data
         
         // close the connection
         connection.end();
     }catch(err){
-        console.log(err);
-        connection.end();
+        console.error(err);
+        if(connection){
+            connection.end();
+        }
     }
 }
