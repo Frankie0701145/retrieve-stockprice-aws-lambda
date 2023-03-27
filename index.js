@@ -42,7 +42,7 @@ const fetchQuotes = async ()=>{
     }
 }
 
-export const handler = async (event, context)=>{
+exports.handler = async (event, context)=>{
     // fetch quotes
     const quotes = await fetchQuotes();
     // fetch quotes
