@@ -54,7 +54,7 @@ exports.handler = async (event, context)=>{
         // create connection
 
         // create table if does not exists
-        const createTableDoesExists = "CREATE TABLE IF NOT EXISTS StockPrice ( company_id integer NOT NULL AUTO_INCREMENT, company_name VARCHAR(50), symbol VARCHAR(20), price decimal(10,2), percent_change decimal(10,2), PRIMARY KEY (company_id) );"
+        const createTableDoesExists = "CREATE TABLE IF NOT EXISTS StockPrice ( company_id integer NOT NULL AUTO_INCREMENT, company_name VARCHAR(50), symbol VARCHAR(20), price decimal(10,2), percent_change decimal(10,2), PRIMARY KEY (company_id), FULLTEXT (symbol,company_name) );"
         await connection.execute(createTableDoesExists)
         // create table if does not exists
 
